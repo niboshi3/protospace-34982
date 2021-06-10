@@ -1,7 +1,6 @@
 class PrototypesController < ApplicationController
   before_action :authenticate_user!, only: [:new, :edit ,:destroy]
   before_action :set_prototype, only: [:show , :edit]
-  before_action :move_to_index,except: [:index , :show]
 
   def index
     @prototypes = Prototype.all
@@ -26,6 +25,9 @@ class PrototypesController < ApplicationController
   end
 
   def edit
+    unless user_signed_in? && current_user.id == @prototype.user_id
+      redirect_to action: :index
+    end
   end
 
   def destroy
@@ -52,13 +54,6 @@ class PrototypesController < ApplicationController
 
   def set_prototype
     @prototype = Prototype.find(params[:id])
-  end
-
-  def move_to_index
-    #投稿者以外のユーザーが、投稿者専用のページに遷移できないように
-    unless user_signed_in? && current_user.id == @prototype.user_id
-      redirect_to action: :index
-    end
   end
 
 end
